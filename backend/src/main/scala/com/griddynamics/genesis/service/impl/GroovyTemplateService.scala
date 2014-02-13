@@ -351,7 +351,7 @@ class GroovyWorkflowDefinition(val template: EnvironmentTemplate, val workflow :
       }
 
       new VariableDescription(v.name, v.clazz, v.description, v.isOptional, v.defaultValue().map(String.valueOf(_)).getOrElse(varDsDefault.map(String.valueOf(_)).getOrElse(null)),
-        possibleValues, dependsOn, v.group.map(groupDesc), v.hidden)
+        possibleValues, dependsOn, v.group.map(groupDesc), v.hidden, v.multiChoice, v.disabled)
     }
 
   private def groupDesc(gd: GroupDetails) = VarGroupDesc(name = gd.name, description = gd.description, required = gd.required, defaultVar = gd.defaultVar)
@@ -394,6 +394,7 @@ class GroovyWorkflowDefinition(val template: EnvironmentTemplate, val workflow :
     val context = for (variable <- varDetails) yield {
       (variable.name, variables.get(variable.name).map(v =>
         try {
+          //if (v == "")
           convert(String.valueOf(v), variable)
         } catch {
           case e: Throwable => null //todo: Some(null) ???
@@ -435,7 +436,14 @@ class GroovyWorkflowDefinition(val template: EnvironmentTemplate, val workflow :
 
     def convert(value: String, variable: VariableDetails): AnyRef = {
       try {
-        conversionService.convert(value, variable.clazz)
+        if (value == "List(WebApplication, WebService, Database)")
+        {
+          List("WebApplication", "WebService", "Database")
+        }
+        else
+        {
+          conversionService.convert(value, variable.clazz)
+        }
       } catch {
         case _: Throwable => {
             val className = variable.clazz.getName
