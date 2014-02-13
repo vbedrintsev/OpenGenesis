@@ -4,7 +4,8 @@ define([
     "modules/status",
     "jquery",
     "underscore",
-    "backbone"
+    "backbone",
+    "multiselect"
 ],
 
 function(genesis, status, $, _, Backbone) {
@@ -225,6 +226,13 @@ function(genesis, status, $, _, Backbone) {
           });
           self._applyResolvedVariables(self.variableValues);
         }
+
+        self.$("select[multiple='multiple']").multiselect({
+              noneSelectedText: "No values selected",
+              selectedText: "# values selected",
+              height: "auto"
+          });
+
         if (callback) callback();
       });
     },

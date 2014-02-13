@@ -150,6 +150,7 @@ class RequestBrokerImpl(storeService: StoreService,
                 dsc.values.getOrElse(Map()).find(_._1 == v)
             })
         }
+
         for ((k, v) <- variables) yield {
             val descriptions: Seq[VariableDescription] = workflow.variableDescriptions
             val value = findDataLabel(k,v,descriptions).getOrElse(findDataLabel(k,v,workflow.partial(variables)).getOrElse((v,v)))._2

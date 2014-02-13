@@ -25,6 +25,7 @@ package com.griddynamics.genesis.template
 
 import scala.collection.JavaConversions._
 import collection.immutable.ListMap
+import scala.collection.Traversable
 
 class ListVarDataSource extends VarDataSource {
     val Key = "values"
@@ -39,6 +40,8 @@ class ListVarDataSource extends VarDataSource {
             case x => Map(x.toString -> x.toString)
         }
     }
+
+    override def hasValue(value: Any) = true
 }
 
 class DependentList extends ListVarDataSource with DependentDataSource {

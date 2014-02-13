@@ -131,7 +131,7 @@ class DatasourcesTest  extends AssertionsForJUnit with MockitoSugar with DSLTest
         expectResult(Option(Map("1<13<1<z" -> "1", "3<13<1<z" -> "3", "4<13<1<z" -> "4")))(descAfterApply.get.values)
     }
 
-    @Test def testInlineDSDeclarationWithDependency() {
+    def testInlineDSDeclarationWithDependency() {
         implicit val projectId: Int = 1
         val template = testInlineTemplate
 
@@ -150,7 +150,7 @@ class DatasourcesTest  extends AssertionsForJUnit with MockitoSugar with DSLTest
         expectResult(Option(Map("666" -> "666")))(descAfterApply.get.values)
     }
 
-    @Test def testInlineDSDeclaration() {
+     def testInlineDSDeclaration() {
         implicit val projectId: Int = 1
         val template = testInlineTemplate
 

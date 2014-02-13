@@ -99,7 +99,8 @@ object VariableDetails {
 class VariableDetails(val name : String, val clazz : Class[_ <: AnyRef], val description : String,
                       val validators : Seq[(String, Closure[Boolean])], val isOptional: Boolean = false, val defaultValue: () => Option[Any],
                       val valuesList: VariableDetails.ValuesListType = None, val dependsOn: Seq[String],
-                      val group: Option[GroupDetails] = None, val hidden: Boolean = false)
+                      val group: Option[GroupDetails] = None, val hidden: Boolean = false, val multiChoice: Boolean = false,
+                      val disabled: Boolean = false)
 
 class VariableBuilder(val name : String, dsClosure: Option[Closure[Unit]],
                       val dataSourceFactories: Seq[DataSourceFactory],
@@ -107,8 +108,11 @@ class VariableBuilder(val name : String, dsClosure: Option[Closure[Unit]],
                       val group: Option[GroupDetails] = None) extends GroovyObjectSupport {
     @BeanProperty var description : String = _
     @BeanProperty var clazz : Class[_ <: AnyRef] = classOf[String]
-    private var defaultVal: Any = _
+    @BeanProperty var defaultVal: Any = _
     @BeanProperty var isOptional: Boolean = false
+    @BeanProperty var multiChoice: Boolean = false
+    @BeanProperty var disabled: Boolean = false
+
   private var isHidden = false
 
     var validators = new collection.mutable.LinkedHashMap[String, Closure[Boolean]]
@@ -251,7 +255,7 @@ class VariableBuilder(val name : String, dsClosure: Option[Closure[Unit]],
              dataSourceRef.flatMap(ds => {dsObj.flatMap(_.default(ds))})
          }
       }
-      new VariableDetails(name, clazz, description, validators.toSeq, isOptional, default, values, parents.toList, group, isHidden)
+      new VariableDetails(name, clazz, description, validators.toSeq, isOptional, default, values, parents.toList, group, isHidden, multiChoice, disabled)
     }
 }
 
