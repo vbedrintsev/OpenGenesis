@@ -8,6 +8,8 @@ define([
     "multiselect"
 ],
 
+//ddddddddddddddddddddddddddddddd
+
 function(genesis, status, $, _, Backbone) {
 
   var variables = genesis.module();
@@ -175,20 +177,36 @@ function(genesis, status, $, _, Backbone) {
       if (variable.group) {
         enable = this.$groupVariableRadio(variable).is(':checked');
       }
-      if (enable) this.$('#' + escapeCss(variable.name)).removeAttr("disabled");
+      
+      if (enable) {
+        var $elem = this.$('#' + escapeCss(variable.name));
+        $elem.removeAttr("disabled");
+        this._setEnableToMultiSelect($elem, "enable");
+      }
+    },
+
+    _setEnableToMultiSelect: function ($element, $value) {
+      if ($element[0].multiple){
+        $element.multiselect("refresh").multiselect($value);
+      }  
     },
 
     _isMultiValue: function (variable) {
       return _.has(variable, "values") && _.size(variable.values) > 0
     },
 
-    _buildOptions: function ($element, valueMap, defaultValue) {
-      $element.append("<option value=''> Please select </option>");
-      _(valueMap).each(function (label, value) {
+    _buildOptions: function ($element, valueMap, multiple, defaultValue) {
+        if (!multiple){
+            $element.append("<option value=''> Please select </option>");
+        }
+        _(valueMap).each(function (label, value) {
         if (label && value) {
           $element.append($("<option/>").attr("value", value).text(label));
         }
       });
+       if (multiple){
+            $element.multiselect("refresh");
+        }
       if (defaultValue) {
         $element.val(defaultValue).change();
       }
@@ -197,6 +215,7 @@ function(genesis, status, $, _, Backbone) {
     _disable: function (select) {
       var $select = select instanceof jQuery ? select : $(select);
       $select.attr('disabled', 'disabled').find("option").remove();
+      this._setEnableToMultiSelect($select, 'disable');
     },
 
     _collectValueObject: function (variables) {
@@ -220,6 +239,7 @@ function(genesis, status, $, _, Backbone) {
           _(resolvedVars).forEach(function(v){
             var $input = self.$("#" + escapeCss(v));
             $input.removeAttr("disabled");
+            self._setEnableToMultiSelect($input, 'enable');
             if($input.hasClass("group")) {
               self.$("input[type='radio'][data-var-name='" + escapeCss(v) + "']").trigger('click');
             }
@@ -272,7 +292,7 @@ function(genesis, status, $, _, Backbone) {
 
             if (!_(invalidVars).contains(variable.name)) {
               $input.find("option").remove();
-              self._buildOptions($input, variable.values, null);
+              self._buildOptions($input, variable.values, variable.multiChoice, null);
               successfullyProcessed.push(variable.name)
             } else {
               self._disable($input)
@@ -311,7 +331,7 @@ function(genesis, status, $, _, Backbone) {
             _(data).each(function (variable) {
               self._enableChecked(variable);
               if (descendants.contains(variable.name) && self._isMultiValue(variable)) {
-                self._buildOptions(self.$("#" + escapeCss(variable.name)), variable.values, variable.defaultValue || null);
+                self._buildOptions(self.$("#" + escapeCss(variable.name)), variable.values, variable.multiChoice, variable.defaultValue || null);
               }
             });
 
@@ -319,6 +339,7 @@ function(genesis, status, $, _, Backbone) {
             _(self.variables).each(function (v) {
               if (v.group && unresolvedVarNames.contains(v.name) && self.$groupVariableRadio(v).is(':checked')) {
                 self.$('#' + escapeCss(v.name)).removeAttr("disabled");
+                self._setEnableToMultiSelect(self.$('#' + escapeCss(v.name)), 'enable');
               }
             });
 
